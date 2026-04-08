@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feriados Nacionais</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", Arial;
+    }
+
+    body {
+      background: #121212;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 15px;
+      width: 350px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #ffffff;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 2px solid #333;
+      border-radius: 8px;
+      font-size: 16px;
+      background: #2a2a2a;
+      color: white;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      border-color: #888;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #333;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #555;
+      transform: scale(1.03);
+    }
+
+    ul {
+      margin-top: 20px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    li {
+      background: #2a2a2a;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: left;
+      border-left: 4px solid #888;
+      color: #ddd;
+      transition: 0.3s;
+    }
+
+    li:hover {
+      background: #3a3a3a;
+      transform: translateX(5px);
+    }
+
+    .erro {
+      color: #ff4d4d;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 400px) {
+      .container {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>📅 Feriados</h1>
+
+    <input type="number" id="ano" placeholder="Digite o ano (ex: 2025)">
+    <button onclick="buscarFeriados()">Buscar</button>
+
+    <p class="erro" id="erro"></p>
+
+    <ul id="lista"></ul>
+  </div>
+
+  <script>
+    function buscarFeriados() {
+      const ano = document.getElementById("ano").value;
+      const lista = document.getElementById("lista");
+      const erro = document.getElementById("erro");
+
+      lista.innerHTML = "";
+      erro.textContent = "";
+
+      if (!ano) {
+        erro.textContent = "⚠️ Digite um ano!";
+        return;
+      }
+
+      fetch(`https://brasilapi.com.br/api/feriados/v1/${ano}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Erro ao buscar dados");
+          }
+          return response.json();
+        })
+        .then(data => {
+
+          if (data.length === 0) {
+            erro.textContent = "Nenhum feriado encontrado.";
+            return;
+          }
+
+          data.forEach(f => {
+            const li = document.createElement("li");
+            li.textContent = `${f.date} - ${f.name}`;
+            lista.appendChild(li);
+          });
+        })
+        .catch(err => {
+          erro.textContent = "❌ " + err.message;
+        });
+    }
+  </script>
+
+</body>
+</html>
